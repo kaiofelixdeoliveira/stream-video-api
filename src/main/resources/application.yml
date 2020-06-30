@@ -1,0 +1,17 @@
+#redis
+#host: if you going to use docker you must change the host to work based on IP,
+# its mean that you musn't use localhost or 127.0.0.1
+#spring.redis.host=10.0.0.21
+spring:
+  application:
+    name: bbpipeline-heroku-api
+
+---
+spring:
+  profiles: dev
+server:
+  port: 8081
+
+---
+spring:
+  profiles: heroku
