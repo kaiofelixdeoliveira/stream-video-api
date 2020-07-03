@@ -1,8 +1,10 @@
 package com.kingoftech.stream_video.api.controllers;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
@@ -11,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,12 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kingoftech.stream_video.api.dto.AuthorizationCodeDTO;
-import com.kingoftech.stream_video.api.dto.ClientCredentialsDTO;
-import com.kingoftech.stream_video.api.dto.DeviceCodeDTO;
-import com.kingoftech.stream_video.api.dto.TokenDTO;
+import com.kingoftech.stream_video.api.dtos.in.AuthorizationCodeDtoIn;
+import com.kingoftech.stream_video.api.dtos.in.ClientCredentialsDtoIn;
+import com.kingoftech.stream_video.api.dtos.in.DeviceCodeDtoIn;
 import com.kingoftech.stream_video.api.exceptions.AuthenticationException;
-import com.kingoftech.stream_video.api.models.Response;
+import com.kingoftech.stream_video.api.models.ResponseModel;
+import com.kingoftech.stream_video.api.models.ResponseModel;
 import com.kingoftech.stream_video.api.services.AuthenticationService;
 
 @RestController
@@ -42,20 +43,21 @@ public class AuthenticationController {
 
 	/**
 	 * @return
+	 * @throws UnsupportedEncodingException
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
 	@PostMapping(value = "/is/token/oauth2")
-	public ResponseEntity<Response<Boolean>> isTokenOAuth2(@Valid @RequestBody TokenDTO token)
-			throws AuthenticationException {
+	public ResponseEntity<ResponseModel> isTokenOAuth2(@Valid @RequestBody String token)
+			throws AuthenticationException, UnsupportedEncodingException {
 
-		Response<Boolean> response = authenticationService.isTokenOAuth2(token);
+		ResponseModel response = authenticationService.isTokenOAuth2(token);
 
-		if (response.getData() == null) {
-			return new ResponseEntity<Response<Boolean>>(response, HttpStatus.UNAUTHORIZED);
+		if (response.getBody() == null) {
+			return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 		}
 
-		return new ResponseEntity<Response<Boolean>>(response, HttpStatus.OK);
+		return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 
 	}
 
@@ -65,17 +67,16 @@ public class AuthenticationController {
 	 * @throws IOException
 	 */
 	@GetMapping(value = "/generate/token/client/credentials/grant", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Response<ClientCredentialsDTO>> generateTokenClientCredentialsGrant()
-			throws ClientProtocolException, IOException {
+	public ResponseEntity<ResponseModel> generateTokenClientCredentialsGrant() throws ClientProtocolException, IOException {
 
-		Response<ClientCredentialsDTO> response = authenticationService.generateTokenClientCredentialsGrant();
+		ResponseModel response = authenticationService.generateTokenClientCredentialsGrant();
 
-		if (response.getData() == null) {
+		if (response.getBody() == null) {
 
-			return new ResponseEntity<Response<ClientCredentialsDTO>>(response, HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 		}
 
-		return new ResponseEntity<Response<ClientCredentialsDTO>>(response, HttpStatus.OK);
+		return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 
 	}
 
@@ -85,19 +86,16 @@ public class AuthenticationController {
 	 * @throws IOException
 	 */
 	@GetMapping(value = "generate/uri/authorization/code/grant", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Response<String>> generateUriAuthorizationCodeGrant()
-			throws ClientProtocolException, IOException {
+	public ResponseEntity<String> generateUriAuthorizationCodeGrant() throws ClientProtocolException, IOException {
 
-		Response<String> response = new Response<String>();
+		String response = authenticationService.generateUriAuthorizationCodeGrant();
 
-		response.setData(authenticationService.generateUriAuthorizationCodeGrant());
+		if (response == null) {
 
-		if (response.getData() == null) {
-
-			return new ResponseEntity<Response<String>>(response, HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
 		}
 
-		return new ResponseEntity<Response<String>>(response, HttpStatus.OK);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
 	}
 
 	/**
@@ -114,7 +112,7 @@ public class AuthenticationController {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
 
 	}
 
@@ -124,17 +122,16 @@ public class AuthenticationController {
 	 * @throws IOException
 	 */
 	@GetMapping(value = "generate/uri/device/grant", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Response<DeviceCodeDTO>> generateUriDeviceGrant()
-			throws ClientProtocolException, IOException {
+	public ResponseEntity<ResponseModel> generateUriDeviceGrant() throws ClientProtocolException, IOException {
 
-		Response<DeviceCodeDTO> response = authenticationService.generateUriDeviceGrant();
+		ResponseModel response = authenticationService.generateUriDeviceGrant();
 
-		if (response.getData() == null) {
+		if (response.getBody() == null) {
 
-			return new ResponseEntity<Response<DeviceCodeDTO>>(response, HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 		}
 
-		return new ResponseEntity<Response<DeviceCodeDTO>>(response, HttpStatus.OK);
+		return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 	}
 
 	/**
@@ -143,36 +140,37 @@ public class AuthenticationController {
 	 * @param code
 	 * @param state
 	 * @return
+	 * @throws UnsupportedEncodingException
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
 	@GetMapping(value = "grant/code/to/token", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Response<AuthorizationCodeDTO>> swapCodeGrantToToken(@Valid @RequestParam String code,
-			@Valid @RequestParam String state) throws AuthenticationException {
+	public ResponseEntity<ResponseModel> swapCodeGrantToToken(@NotNull @RequestParam String code,
+			@NotNull @RequestParam String state) throws AuthenticationException, UnsupportedEncodingException {
 
-		Response<AuthorizationCodeDTO> response = authenticationService.swapCodeGrantToToken(code, state);
+		ResponseModel response = authenticationService.swapCodeGrantToToken(code, state);
 
-		if (response.getData() == null) {
+		if (response.getBody() == null) {
 
-			return new ResponseEntity<Response<AuthorizationCodeDTO>>(response, HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 		}
 
-		return new ResponseEntity<Response<AuthorizationCodeDTO>>(response, HttpStatus.OK);
+		return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 
 	}
 
-	@PostMapping(value = "/check/device/code/grant")
-	public ResponseEntity<Response<DeviceCodeDTO>> checkDeviceCodeGrant(
-			@RequestParam(value = "user_code") String userCode, @RequestParam(value = "device_code") String deviceCode)
-			throws AuthenticationException {
+	@PostMapping(value = "/check/device/code/grant", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ResponseModel> checkDeviceCodeGrant(@RequestParam(value = "user_code") @NotNull String userCode,
+			@RequestParam(value = "device_code") @NotNull String deviceCode)
+			throws AuthenticationException, UnsupportedEncodingException {
 
-		Response<DeviceCodeDTO> response = authenticationService.checkDeviceGrant(userCode, deviceCode);
+		ResponseModel response = authenticationService.checkDeviceGrant(userCode, deviceCode);
 
-		if (response.getData() == null) {
-			return new ResponseEntity<Response<DeviceCodeDTO>>(response, HttpStatus.UNAUTHORIZED);
+		if (response.getBody() == null) {
+			return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 		}
 
-		return new ResponseEntity<Response<DeviceCodeDTO>>(response, HttpStatus.OK);
+		return new ResponseEntity<ResponseModel>(response, HttpStatus.valueOf(response.getStatusCode()));
 
 	}
 

@@ -1,4 +1,4 @@
-package com.kingoftech.stream_video.api.dto;
+package com.kingoftech.stream_video.api.dtos;
 
 import java.util.Arrays;
 import java.util.List;

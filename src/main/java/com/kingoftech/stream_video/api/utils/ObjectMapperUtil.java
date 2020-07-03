@@ -1,4 +1,4 @@
-package com.kingoftech.stream_video.api.util;
+package com.kingoftech.stream_video.api.utils;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

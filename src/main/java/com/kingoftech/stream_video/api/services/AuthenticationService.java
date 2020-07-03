@@ -1,29 +1,32 @@
 package com.kingoftech.stream_video.api.services;
 
+import java.io.UnsupportedEncodingException;
+
 import org.springframework.lang.NonNull;
 
-import com.kingoftech.stream_video.api.dto.AuthorizationCodeDTO;
-import com.kingoftech.stream_video.api.dto.ClientCredentialsDTO;
-import com.kingoftech.stream_video.api.dto.DeviceCodeDTO;
-import com.kingoftech.stream_video.api.dto.TokenDTO;
+import com.kingoftech.stream_video.api.dtos.in.AuthorizationCodeDtoIn;
+import com.kingoftech.stream_video.api.dtos.in.ClientCredentialsDtoIn;
+import com.kingoftech.stream_video.api.dtos.in.DeviceCodeDtoIn;
 import com.kingoftech.stream_video.api.exceptions.AuthenticationException;
-import com.kingoftech.stream_video.api.models.Response;
+import com.kingoftech.stream_video.api.models.ResponseModel;
+import com.kingoftech.stream_video.api.models.ResponseModel;
 
 public interface AuthenticationService {
 
-	public Response<DeviceCodeDTO> checkDeviceGrant(String userCode, String deviceCode) throws AuthenticationException;
+	public ResponseModel checkDeviceGrant(String userCode, String deviceCode)
+			throws AuthenticationException, UnsupportedEncodingException;
 
-	public Response<Boolean> isTokenOAuth2(@NonNull TokenDTO token) throws AuthenticationException;
+	public ResponseModel isTokenOAuth2(@NonNull String token) throws AuthenticationException, UnsupportedEncodingException;
 
-	public Response<ClientCredentialsDTO> generateTokenClientCredentialsGrant() throws AuthenticationException;
+	public ResponseModel generateTokenClientCredentialsGrant() throws AuthenticationException, UnsupportedEncodingException;
 
-	public String generateUriAuthorizationCodeGrant() throws AuthenticationException;
+	public String generateUriAuthorizationCodeGrant() throws AuthenticationException, UnsupportedEncodingException;
 
-	public String generateUriTokenGrant() throws AuthenticationException;
+	public String generateUriTokenGrant() throws AuthenticationException, UnsupportedEncodingException;
 
-	public Response<DeviceCodeDTO> generateUriDeviceGrant() throws AuthenticationException;
+	public ResponseModel generateUriDeviceGrant() throws AuthenticationException, UnsupportedEncodingException;
 
-	public Response<AuthorizationCodeDTO> swapCodeGrantToToken(String codeGrant, String state)
-			throws AuthenticationException;
+	public ResponseModel swapCodeGrantToToken(String codeGrant, String state)
+			throws AuthenticationException, UnsupportedEncodingException;
 
 }

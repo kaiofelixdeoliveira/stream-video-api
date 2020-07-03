@@ -1,21 +1,10 @@
 package com.kingoftech.stream_video.api.services.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
 
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +12,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import com.kingoftech.stream_video.api.dto.AuthorizationCodeDTO;
-import com.kingoftech.stream_video.api.dto.ClientCredentialsDTO;
-import com.kingoftech.stream_video.api.dto.DeviceCodeDTO;
-import com.kingoftech.stream_video.api.dto.TokenDTO;
+import com.kingoftech.stream_video.api.components.ApiComponent;
 import com.kingoftech.stream_video.api.enums.AuthEnum;
 import com.kingoftech.stream_video.api.exceptions.AuthenticationException;
-import com.kingoftech.stream_video.api.models.Response;
+import com.kingoftech.stream_video.api.models.RequestModel;
+import com.kingoftech.stream_video.api.models.ResponseModel;
 import com.kingoftech.stream_video.api.services.AuthenticationService;
-import com.kingoftech.stream_video.api.util.ObjectMapperUtil;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -53,78 +39,40 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Value("${base.url.vimeo}")
 	private String baseUrlVimeo;
 
-	public Response<Boolean> isTokenOAuth2(@NonNull TokenDTO token) throws AuthenticationException {
+	public ResponseModel isTokenOAuth2(@NonNull String token)
+			throws AuthenticationException, UnsupportedEncodingException {
 
-		try (CloseableHttpClient client = HttpClients.createDefault()) {
-			HttpGet httpGet = new HttpGet(baseUrlVimeo + "/oauth/verify");
+		RequestModel request = new RequestModel();
+		request.setMethodName(HttpGet.METHOD_NAME);
+		request.setToken(token);
+		request.setUrl(baseUrlVimeo + "/oauth/verify");
+		request.setTypeAuthorization(AuthEnum.AUTHORIZATION_BEARER);
+		request.setContentType(AuthEnum.CONTENT_TYPE_JSON);
 
-			httpGet.setHeader(HttpHeaders.ACCEPT, AuthEnum.VALUE_HEADER_ACCEPT.getValue());
-			httpGet.setHeader(HttpHeaders.CONTENT_TYPE, AuthEnum.VALUE_HEADER_CONTENT_TYPE.getValue());
-			httpGet.setHeader(HttpHeaders.AUTHORIZATION, "bearer " + token.getToken());
-
-			CloseableHttpResponse response = client.execute(httpGet);
-			String responseBody = EntityUtils.toString(response.getEntity());
-			log.info("status line: {}", response.getStatusLine());
-
-			Response<Boolean> reponseApi = new Response<Boolean>();
-			if (response.getStatusLine().getStatusCode() == 200) {
-				reponseApi.setData(true);
-				return reponseApi;
-			}
-			log.error("status line: {}", response.getStatusLine());
-			log.error("status line: {}", responseBody);
-
-			reponseApi.setError(ObjectMapperUtil.objectMapper.readTree(responseBody));
-			return reponseApi;
-		} catch (Exception e) {
-
-			throw new AuthenticationException("error when check token type OAuth2" + e);
-
-		}
+		return ApiComponent.apiRequest(request);
 	}
 
 	/**
 	 * Using the client credentials grant
 	 * 
 	 * generate token for access only data public
+	 * 
+	 * @throws UnsupportedEncodingException
 	 */
-	public Response<ClientCredentialsDTO> generateTokenClientCredentialsGrant() throws AuthenticationException {
-		try (CloseableHttpClient client = HttpClients.createDefault()) {
-			HttpPost httpPost = new HttpPost(baseUrlVimeo + "/oauth/authorize/client");
+	public ResponseModel generateTokenClientCredentialsGrant() throws AuthenticationException, UnsupportedEncodingException {
 
-			JSONObject json = new JSONObject();
-			json.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_CLIENT_DETAILS.getValue());//
-			json.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
+		JSONObject params = new JSONObject();
+		params.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_CLIENT_DETAILS.getValue());//
+		params.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
 
-			StringEntity entity = new StringEntity(json.toString());
+		RequestModel request = new RequestModel();
+		request.setMethodName(HttpPost.METHOD_NAME);
+		request.setUrl(baseUrlVimeo + "/oauth/authorize/client");
+		request.setTypeAuthorization(AuthEnum.AUTHORIZATION_BASIC);
+		request.setContentType(AuthEnum.CONTENT_TYPE_JSON);
+		request.setParams(params);
 
-			httpPost.setEntity(entity);
-			httpPost.setHeader(HttpHeaders.ACCEPT, AuthEnum.VALUE_HEADER_ACCEPT.getValue());
-			httpPost.setHeader(HttpHeaders.CONTENT_TYPE, AuthEnum.VALUE_HEADER_CONTENT_TYPE.getValue());
-			httpPost.setHeader(HttpHeaders.AUTHORIZATION, "basic " + basicAuth());
-
-			CloseableHttpResponse response = client.execute(httpPost);
-
-			log.info("status line: {}", response.getStatusLine());
-			String responseBody = EntityUtils.toString(response.getEntity());
-			Response<ClientCredentialsDTO> reponseApi = new Response<ClientCredentialsDTO>();
-			if (response.getStatusLine().getStatusCode() == 200) {
-
-				reponseApi.setData(ObjectMapperUtil.objectMapper.readValue(responseBody, ClientCredentialsDTO.class));
-				log.info("responseBody: {}", reponseApi);
-				return reponseApi;
-			}
-			log.error("status line: {}", response.getStatusLine());
-			log.error("status line: {}", responseBody);
-
-			reponseApi.setError(ObjectMapperUtil.objectMapper.readTree(responseBody));
-			return reponseApi;
-
-		} catch (Exception e) {
-
-			throw new AuthenticationException("error when genetate Token using the client credentials grant" + e);
-
-		}
+		return ApiComponent.apiRequest(request);
 	}
 
 	/**
@@ -135,57 +83,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @param codeGrant mandatory for swap to token
 	 * @param state
 	 * @return token if sucess
+	 * @throws UnsupportedEncodingException
 	 * @throws IOException
 	 */
-	public Response<AuthorizationCodeDTO> swapCodeGrantToToken(@NonNull String codeGrant, @NonNull String state)
-			throws AuthenticationException {
+	public ResponseModel swapCodeGrantToToken(@NonNull String codeGrant, @NonNull String state)
+			throws AuthenticationException, UnsupportedEncodingException {
 
 		if (!state.equals(AuthEnum.VALUE_STATE.getValue())) {
 			throw new AuthenticationException("state received not equals state send");
 
 		}
-		try (CloseableHttpClient client = HttpClients.createDefault()) {
+		JSONObject params = new JSONObject();
+		params.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_AUTHORIZATION_CODE.getValue());
+		params.put(AuthEnum.CODE.getValue(), codeGrant);
+		params.put(AuthEnum.REDIRECT_URI.getValue(), AuthEnum.VALUE_REDIRECT_URI_GRANT_CODE_TO_TOKEN.getValue());
 
-			HttpPost httpPost = new HttpPost(baseUrlVimeo + "/oauth/access_token");
+		RequestModel request = new RequestModel();
 
-			JSONObject json = new JSONObject();
-			json.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_AUTHORIZATION_CODE.getValue());
-			json.put(AuthEnum.CODE.getValue(), codeGrant);
-			json.put(AuthEnum.REDIRECT_URI.getValue(), AuthEnum.VALUE_REDIRECT_URI_GRANT_CODE_TO_TOKEN.getValue());
+		request.setUrl(baseUrlVimeo + "/oauth/access_token");
+		request.setParams(params);
+		request.setMethodName(HttpPost.METHOD_NAME);
+		request.setTypeAuthorization(AuthEnum.AUTHORIZATION_BASIC);
+		request.setContentType(AuthEnum.CONTENT_TYPE_JSON);
 
-			StringEntity entity = new StringEntity(json.toString());
-
-			httpPost.setEntity(entity);
-
-			httpPost.setHeader(HttpHeaders.ACCEPT, AuthEnum.VALUE_HEADER_ACCEPT.getValue());
-			httpPost.setHeader(HttpHeaders.CONTENT_TYPE, AuthEnum.VALUE_HEADER_CONTENT_TYPE.getValue());
-			httpPost.setHeader(HttpHeaders.AUTHORIZATION, "basic " + basicAuth());
-
-			log.info("params:" + EntityUtils.toString(httpPost.getEntity()));
-			CloseableHttpResponse response = client.execute(httpPost);
-
-			String responseBody = EntityUtils.toString(response.getEntity());
-			Response<AuthorizationCodeDTO> responseApi = new Response<AuthorizationCodeDTO>();
-
-			if (response.getStatusLine().getStatusCode() == 200) {
-
-				responseApi.setData(ObjectMapperUtil.objectMapper.readValue(responseBody, AuthorizationCodeDTO.class));
-				log.info("responseBody: {}", responseApi);
-
-				return responseApi;
-			}
-			log.error("status line: {}", response.getStatusLine());
-			log.error("status line: {}", responseBody);
-			responseApi.setError(ObjectMapperUtil.objectMapper.readTree(responseBody));
-			return responseApi;
-
-		} catch (Exception e) {
-
-			throw new AuthenticationException(
-					"error when swap CodeGrant To Token using the authorization code grant" + e);
-
-		}
-
+		return ApiComponent.apiRequest(request);
 	}
 
 	/**
@@ -254,92 +175,45 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	}
 
-	
+	public ResponseModel generateUriDeviceGrant() throws AuthenticationException, UnsupportedEncodingException {
+		String url = baseUrlVimeo + "/oauth/device";
 
-	public Response<DeviceCodeDTO> generateUriDeviceGrant() throws AuthenticationException {
-		try (CloseableHttpClient client = HttpClients.createDefault()) {
-			HttpPost httpPost = new HttpPost(baseUrlVimeo + "/oauth/device");
+		JSONObject params = new JSONObject();
+		params.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_DEVICE.getValue());//
+		params.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
 
-			JSONObject json = new JSONObject();
-			json.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_DEVICE.getValue());//
-			json.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
+		RequestModel request = new RequestModel();
+		request.setMethodName(HttpPost.METHOD_NAME);
+		request.setUrl(baseUrlVimeo + "/oauth/device");
+		request.setTypeAuthorization(AuthEnum.AUTHORIZATION_BASIC);
+		request.setContentType(AuthEnum.CONTENT_TYPE_JSON);
+		request.setParams(params);
 
-			StringEntity entity = new StringEntity(json.toString());
-			httpPost.setEntity(entity);
-			httpPost.setHeader(HttpHeaders.ACCEPT, AuthEnum.VALUE_HEADER_ACCEPT.getValue());
-			httpPost.setHeader(HttpHeaders.CONTENT_TYPE, AuthEnum.VALUE_HEADER_CONTENT_TYPE.getValue());
-			httpPost.setHeader(HttpHeaders.AUTHORIZATION, "basic " + basicAuth());
-
-			CloseableHttpResponse response = client.execute(httpPost);
-			String responseBody = EntityUtils.toString(response.getEntity());
-
-			log.info("status line: {}", response.getStatusLine());
-
-			Response<DeviceCodeDTO> responseApi = new Response<DeviceCodeDTO>();
-			if (response.getStatusLine().getStatusCode() == 200) {
-
-				responseApi.setData(ObjectMapperUtil.objectMapper.readValue(responseBody, DeviceCodeDTO.class));
-				log.info("responseBody: {}", responseApi.toString());
-				return responseApi;
-			}
-			log.error("status line: {}", response.getStatusLine());
-			log.error("status line: {}", responseBody.toString());
-			responseApi.setError(ObjectMapperUtil.objectMapper.readTree(responseBody));
-			return responseApi;
-
-		} catch (Exception e) {
-
-			throw new AuthenticationException("error when generate uri device Grant" + e);
-
-		}
+		return ApiComponent.apiRequest(request);
 
 	}
-	
+
 	/**
 	 * Check if code device is accept, then return data the user
+	 * 
+	 * @throws UnsupportedEncodingException
 	 */
-	public Response<DeviceCodeDTO> checkDeviceGrant(@NonNull String userCode, @NonNull String deviceCode) throws AuthenticationException {
-		try (CloseableHttpClient client = HttpClients.createDefault()) {
-			HttpPost httpPost = new HttpPost(baseUrlVimeo + "/oauth/device/authorize");
+	public ResponseModel checkDeviceGrant(@NonNull String userCode, @NonNull String deviceCode)
+			throws AuthenticationException, UnsupportedEncodingException {
 
-			JSONObject json = new JSONObject();
-			json.put(AuthEnum.USER_CODE.getValue(), userCode);//
-			json.put(AuthEnum.DEVICE_CODE.getValue(), deviceCode);//
+		JSONObject params = new JSONObject();
+		params.put(AuthEnum.USER_CODE.getValue(), userCode);//
+		params.put(AuthEnum.DEVICE_CODE.getValue(), deviceCode);//
 
-			StringEntity entity = new StringEntity(json.toString());
-			httpPost.setEntity(entity);
-			httpPost.setHeader(HttpHeaders.ACCEPT, AuthEnum.VALUE_HEADER_ACCEPT.getValue());
-			httpPost.setHeader(HttpHeaders.CONTENT_TYPE, AuthEnum.VALUE_HEADER_CONTENT_TYPE.getValue());
-			httpPost.setHeader(HttpHeaders.AUTHORIZATION, "basic " + basicAuth());
+		RequestModel request = new RequestModel();
+		request.setMethodName(HttpPost.METHOD_NAME);
+		request.setUrl(baseUrlVimeo + "/oauth/device/authorize");
+		request.setTypeAuthorization(AuthEnum.AUTHORIZATION_BASIC);
+		request.setContentType(AuthEnum.CONTENT_TYPE_JSON);
+		request.setParams(params);
 
-			CloseableHttpResponse response = client.execute(httpPost);
-			String responseBody = EntityUtils.toString(response.getEntity());
+		return ApiComponent.apiRequest(request);
 
-			log.info("status line: {}", response.getStatusLine());
-
-			Response<DeviceCodeDTO> responseApi = new Response<DeviceCodeDTO>();
-			if (response.getStatusLine().getStatusCode() == 200) {
-
-				responseApi.setData(ObjectMapperUtil.objectMapper.readValue(responseBody, DeviceCodeDTO.class));
-				log.info("responseBody: {}", responseBody);
-				return responseApi;
-			}
-			log.error("status line: {}", response.getStatusLine());
-			log.error("status line: {}", responseBody);
-			responseApi.setError(ObjectMapperUtil.objectMapper.readTree(responseBody));
-			return responseApi;
-
-		} catch (Exception e) {
-
-			throw new AuthenticationException("error when check device code" + e);
-
-		}
-
-	}
-
-	public String basicAuth() {
-		String userCredentials = idClient + ":" + secret;
-		return new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 	}
 
 }

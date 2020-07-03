@@ -1,4 +1,4 @@
-package com.kingoftech.stream_video.api.dto;
+package com.kingoftech.stream_video.api.dtos.in;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GrantCodeDTO {
+public class GrantCodeDtoIn {
 
 	@NotNull
 	@JsonProperty("access_token")

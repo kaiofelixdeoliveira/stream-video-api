@@ -2,7 +2,14 @@ package com.kingoftech.stream_video.api.enums;
 
 public enum AuthEnum {
 
-	// FIELDS
+	// ENUM
+	AUTHORIZATION_BASIC,
+	AUTHORIZATION_BEARER,
+	CONTENT_TYPE_STREAM,
+	CONTENT_TYPE_JSON,
+	
+	// FIELD
+
 	USER_CODE("user_code"),
 	DEVICE_CODE("device_code"),
 	CODE("code"), //
@@ -19,20 +26,22 @@ public enum AuthEnum {
 	/*
 	 * AUTHORIZATION
 	 */
-	VALUE_AUTHORIZATION_BASIC("basic"), //
-	VALUE_AUTHORIZATION_BEARER("bearer"), //
+	VALUE_AUTHORIZATION_BASIC("basic "), //
+	VALUE_AUTHORIZATION_BEARER("bearer "), //
 	/*
 	 * REDIRECT_URI
 	 */
-	VALUE_REDIRECT_URI_GRANT_CODE_TO_TOKEN("https://murmuring-retreat-08864.herokuapp.com/auth/grant/code/to/token"), //
-	VALUE_REDIRECT_URI_GRANT_TOKEN("https://murmuring-retreat-08864.herokuapp.com/auth/grant/token"), //
+	VALUE_REDIRECT_URI_GRANT_CODE_TO_TOKEN("https://stream-video-api.herokuapp.com/auth/grant/code/to/token"), //
+	VALUE_REDIRECT_URI_GRANT_TOKEN("https://stream-video-api.herokuapp.com/auth/grant/token"), //
 
 	/*
 	 * HEADER
 	 */
 
+	
 	VALUE_HEADER_ACCEPT("application/vnd.vimeo.*+json;version=3.4"), //
-	VALUE_HEADER_CONTENT_TYPE("application/json"), //
+	VALUE_HEADER_CONTENT_TYPE_JSON("application/json"), //
+	VALUE_HEADER_CONTENT_TYPE_STREAM("application/offset+octet-stream"),
 
 	/*
 	 * STATE
@@ -63,6 +72,10 @@ public enum AuthEnum {
 
 	AuthEnum(final String value) {
 		this.value = value;
+	}
+
+	AuthEnum() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public String getValue() {

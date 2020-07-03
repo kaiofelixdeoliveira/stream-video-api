@@ -1,10 +1,10 @@
-package com.kingoftech.stream_video.api.dto;
+package com.kingoftech.stream_video.api.dtos.out;
 
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class AuthorizationCodeDTO extends GrantCodeDTO {
+public class AuthorizationCodeDtoOut extends GrantCodeDtoOut {
 
 	@NotNull
 	JsonNode user;

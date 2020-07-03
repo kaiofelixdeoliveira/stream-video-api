@@ -2,6 +2,9 @@ package com.kingoftech.stream_video.api.controllers;
 
 import java.io.IOException;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +31,7 @@ public class UserController {
 	}
 
 	@GetMapping(value = "/me/feed", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getFeeds(@RequestParam String token) throws ClientProtocolException, IOException {
+	public ResponseEntity<String> getFeeds(@RequestParam @Valid String token) throws ClientProtocolException, IOException {
 
 		String response = userService.getFeeds(token);
 

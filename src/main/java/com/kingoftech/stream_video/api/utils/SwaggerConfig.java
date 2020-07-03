@@ -1,4 +1,4 @@
-package com.kingoftech.stream_video.api.util;
+package com.kingoftech.stream_video.api.utils;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

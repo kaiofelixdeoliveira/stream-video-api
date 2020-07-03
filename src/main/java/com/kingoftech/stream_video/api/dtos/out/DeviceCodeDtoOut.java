@@ -1,11 +1,11 @@
-package com.kingoftech.stream_video.api.dto;
+package com.kingoftech.stream_video.api.dtos.out;
 
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class DeviceCodeDTO extends GrantCodeDTO {
+public class DeviceCodeDtoOut extends GrantCodeDtoOut {
 	@NotNull
 	@JsonProperty("device_code")
 	String deviceCode;
