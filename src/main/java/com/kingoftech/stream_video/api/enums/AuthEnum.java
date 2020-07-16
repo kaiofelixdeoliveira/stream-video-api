@@ -31,8 +31,8 @@ public enum AuthEnum {
 	/*
 	 * REDIRECT_URI
 	 */
-	VALUE_REDIRECT_URI_GRANT_CODE_TO_TOKEN("https://stream-vimeo-api.herokuapp.com/auth/grant/code/to/token"), //
-	VALUE_REDIRECT_URI_GRANT_TOKEN("https://stream-vimeo-api.herokuapp.com/auth/grant/token"), //
+	VALUE_REDIRECT_URI_GRANT_CODE_TO_TOKEN("https://stream-video-api.herokuapp.com/auth/grant/code/to/token"), //
+	VALUE_REDIRECT_URI_GRANT_TOKEN("https://stream-video-api.herokuapp.com/auth/grant/token"), //
 
 	/*
 	 * HEADER
