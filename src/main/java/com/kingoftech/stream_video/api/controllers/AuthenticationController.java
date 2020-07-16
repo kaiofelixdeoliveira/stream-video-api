@@ -145,7 +145,7 @@ public class AuthenticationController {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	@PostMapping(value = "grant/code/to/token", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "grant/code/to/token", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ResponseModel> swapCodeGrantToToken(@NotNull @RequestParam String code,
 			@NotNull @RequestParam String state) throws AuthenticationException, UnsupportedEncodingException {
 
