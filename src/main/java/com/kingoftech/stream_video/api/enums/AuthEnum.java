@@ -37,7 +37,6 @@ public enum AuthEnum {
 	/*
 	 * HEADER
 	 */
-
 	
 	VALUE_HEADER_ACCEPT("application/vnd.vimeo.*+json;version=3.4"), //
 	VALUE_HEADER_CONTENT_TYPE_JSON("application/json"), //
