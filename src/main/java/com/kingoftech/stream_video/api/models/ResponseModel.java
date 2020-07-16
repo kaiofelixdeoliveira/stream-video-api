@@ -41,10 +41,10 @@ public class ResponseModel {
 
 	public int getRateLimit() {
 
-		String xRateLimitLimit = getHeaders().findValue("X-RateLimit-Limit").textValue();
+		JsonNode xRateLimitLimit = getHeaders().findValue("X-RateLimit-Limit");
 
 		if (xRateLimitLimit != null)
-			return Integer.parseInt(xRateLimitLimit);
+			return Integer.parseInt(xRateLimitLimit.textValue());
 
 		return 0;
 
@@ -52,16 +52,21 @@ public class ResponseModel {
 
 	public int getRateLimitRemaining() {
 
-		String xRateLimitRemaining = getHeaders().findValue("X-RateLimit-Remaining").textValue();
+		JsonNode xRateLimitRemaining = getHeaders().findValue("X-RateLimit-Remaining");
 
 		if (xRateLimitRemaining != null)
-			return Integer.parseInt(xRateLimitRemaining);
+			return Integer.parseInt(xRateLimitRemaining.textValue());
 
 		return 0;
 	}
 
-	public String getRateLimitReset() {
-		return getHeaders().findValue("X-RateLimit-Reset").textValue();
+	public int getRateLimitReset() {
+		JsonNode xRateLimitReset =  getHeaders().findValue("X-RateLimit-Reset");
+		
+		if (xRateLimitReset != null)
+			return Integer.parseInt(xRateLimitReset.textValue());
+
+		return 0;
 
 	}
 

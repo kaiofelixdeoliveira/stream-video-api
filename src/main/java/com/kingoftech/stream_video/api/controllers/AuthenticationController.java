@@ -48,7 +48,7 @@ public class AuthenticationController {
 	 * @throws IOException
 	 */
 	@PostMapping(value = "/is/token/oauth2")
-	public ResponseEntity<ResponseModel> isTokenOAuth2(@Valid @RequestBody String token)
+	public ResponseEntity<ResponseModel> isTokenOAuth2(@RequestParam String token)
 			throws AuthenticationException, UnsupportedEncodingException {
 
 		ResponseModel response = authenticationService.isTokenOAuth2(token);
@@ -67,7 +67,8 @@ public class AuthenticationController {
 	 * @throws IOException
 	 */
 	@GetMapping(value = "/generate/token/client/credentials/grant", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ResponseModel> generateTokenClientCredentialsGrant() throws ClientProtocolException, IOException {
+	public ResponseEntity<ResponseModel> generateTokenClientCredentialsGrant()
+			throws ClientProtocolException, IOException {
 
 		ResponseModel response = authenticationService.generateTokenClientCredentialsGrant();
 
@@ -144,7 +145,7 @@ public class AuthenticationController {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	@GetMapping(value = "grant/code/to/token", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "grant/code/to/token", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ResponseModel> swapCodeGrantToToken(@NotNull @RequestParam String code,
 			@NotNull @RequestParam String state) throws AuthenticationException, UnsupportedEncodingException {
 
@@ -160,7 +161,8 @@ public class AuthenticationController {
 	}
 
 	@PostMapping(value = "/check/device/code/grant", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ResponseModel> checkDeviceCodeGrant(@RequestParam(value = "user_code") @NotNull String userCode,
+	public ResponseEntity<ResponseModel> checkDeviceCodeGrant(
+			@RequestParam(value = "user_code") @NotNull String userCode,
 			@RequestParam(value = "device_code") @NotNull String deviceCode)
 			throws AuthenticationException, UnsupportedEncodingException {
 
