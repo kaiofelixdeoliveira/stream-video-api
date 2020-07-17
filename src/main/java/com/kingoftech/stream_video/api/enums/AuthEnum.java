@@ -52,7 +52,10 @@ public enum AuthEnum {
 	 */
 	VALUE_SCOPE_PUBLIC("public"), //
 	VALUE_SCOPE_PRIVATE("private"), //
-
+	VALUE_SCOPE_CREATE("create"),//
+	VALUE_SCOPE_EDIT("edit"),//
+	VALUE_SCOPE_UPLOAD("upload"),//
+	VALUE_SCOPE_FULL("private create edit upload delete public"),
 	/*
 	 * RESPONSE TYPE
 	 */

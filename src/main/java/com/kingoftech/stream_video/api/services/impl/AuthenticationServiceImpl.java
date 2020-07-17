@@ -63,7 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		JSONObject params = new JSONObject();
 		params.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_CLIENT_DETAILS.getValue());//
-		params.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
+		params.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_PUBLIC.getValue());//
 
 		RequestModel request = new RequestModel();
 		request.setMethodName(HttpPost.METHOD_NAME);
@@ -137,7 +137,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				.append("&")//
 				.append(AuthEnum.SCOPE.getValue()) //
 				.append("=")//
-				.append(AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
+				.append(AuthEnum.VALUE_SCOPE_FULL.getValue());//
 		return url.toString();
 
 	}
@@ -170,7 +170,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				.append("&")//
 				.append(AuthEnum.SCOPE.getValue()) //
 				.append("=")//
-				.append(AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
+				.append(AuthEnum.VALUE_SCOPE_FULL.getValue());//
 		return url.toString();
 
 	}
@@ -180,7 +180,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		JSONObject params = new JSONObject();
 		params.put(AuthEnum.GRANT_TYPE.getValue(), AuthEnum.VALUE_GRANT_TYPE_DEVICE.getValue());//
-		params.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_PRIVATE.getValue());//
+		params.put(AuthEnum.SCOPE.getValue(), AuthEnum.VALUE_SCOPE_FULL.getValue());//
 
 		RequestModel request = new RequestModel();
 		request.setMethodName(HttpPost.METHOD_NAME);
