@@ -28,5 +28,8 @@ public interface AuthenticationService {
 
 	public ResponseModel swapCodeGrantToToken(String codeGrant, String state)
 			throws AuthenticationException, UnsupportedEncodingException;
+	
+	public ResponseModel generateTokenGrant() throws AuthenticationException;
+
 
 }

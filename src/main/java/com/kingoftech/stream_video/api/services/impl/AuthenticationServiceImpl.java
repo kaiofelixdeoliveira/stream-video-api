@@ -216,4 +216,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	}
 
+	@Override
+	public ResponseModel generateTokenGrant() throws AuthenticationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

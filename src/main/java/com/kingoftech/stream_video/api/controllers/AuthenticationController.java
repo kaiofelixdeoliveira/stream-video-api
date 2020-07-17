@@ -99,7 +99,7 @@ public class AuthenticationController {
 		return new ResponseEntity<String>(response, HttpStatus.OK);
 	}
 
-	/**
+	/** generate uri implicit grant
 	 * @return
 	 * @throws ClientProtocolException
 	 * @throws IOException
@@ -115,6 +115,20 @@ public class AuthenticationController {
 
 		return new ResponseEntity<String>(response, HttpStatus.OK);
 
+	}
+	
+	/** generate token implicit grant
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
+	@GetMapping(value = "generate/token/grant", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> generateTokenGrant() throws ClientProtocolException, IOException {
+
+		//ResponseModel response = authenticationService.generateTokenGrant();
+
+
+		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 
 	/**
